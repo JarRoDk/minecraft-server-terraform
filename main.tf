@@ -48,7 +48,7 @@ data "template_file" "default" {
     minecraft-version = "1.17.1"
     minecraft-download-spigot = "https://download.getbukkit.org/spigot/spigot"
     openjdk = "java-latest-openjdk-16.0.1.0.9-3.rolling.el7.x86_64"
-    minecraft-core = "/var/opt/minecraft"
+    minecraft-core = "/opt/minecraft"
     minecraft-words = "words"
   }
 }
