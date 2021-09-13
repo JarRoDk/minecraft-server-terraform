@@ -1,24 +1,52 @@
 #!/bin/bash 
-yum install ${openjdk} tmux wget zsh git -y 
-mkdir -p ${minecraft-core}/world
-mkdir -p ${minecraft-core}/world_nether
-mkdir -p ${minecraft-core}/world_the_end
-mkdir -p ${minecraft-core}/plugins
+yum install ${openjdk} tmux wget zsh git unzip -y
+mkdir -p ${minecraft-core}/${minecraft-bin}
+mkdir -p ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}
+
 cd ${minecraft-core}
-wget ${minecraft-download-spigot}-${minecraft-version}.jar -O ${minecraft-core}/spigot${minecraft-version}.jar
-echo "eula=true" >> ${minecraft-core}/eula.txt
 
 CHSH=no sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 chsh -s /bin/zsh
 
-gsutil -m cp -r gs://minecraft-server-terraform/world-1an world
-gsutil -m cp -r gs://minecraft-server-terraform/world_nether-1an world_nether
-gsutil -m cp -r gs://minecraft-server-terraform/world_the_end-1an world_the_end
+gsutil -m cp -r gs://minecraft-server-terraform/maps/${map-prefix}-${realm} ${minecraft-core}/${minecraft-maps}
+gsutil -m cp -r gs://minecraft-server-terraform/${minecraft-version}/spigot-server ${minecraft-core}
 
-gsutil -m cp -r gs://minecraft-server-terraform/plugins-1an plugins
+cd ${minecraft-core}/${minecraft-bin}
+tmux new-session -d -s Minecraft-Server 'java -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
 
-tmux new-session -d -s Minecraft-Server 'java -jar ${minecraft-core}/spigot${minecraft-version}.jar'
 
-#gsutil -m cp -r world_nether gs://minecraft-server-terraform/world_nether-1an/
-#gsutil -m cp -r world_the_end gs://minecraft-server-terraform/world_the_end-1an/
-#gsutil -m cp -r plugins gs://minecraft-server-terraform/plugins-1an/
+cat <<EOF >${minecraft-core}/backup-map.sh
+gsutil -m cp -r ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm} gs://minecraft-server-terraform/maps
+EOF
+
+cat <<EOF >${minecraft-core}/backup-server.sh
+gsutil -m cp -r ${minecraft-core}/${minecraft-bin} gs://minecraft-server-terraform/${minecraft-version}
+EOF
+
+cat <<EOF >${minecraft-core}/backup-all.sh
+gsutil -m cp -r ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm} gs://minecraft-server-terraform/maps
+gsutil -m cp -r ${minecraft-core}/${minecraft-bin} gs://minecraft-server-terraform/${minecraft-version}
+EOF
+
+cat <<EOF >${minecraft-core}/${minecraft-bin}/plugins/SimpleBackup/config.yml
+backup-interval-hours: ${simplybackup-interval-hours}
+backup-file: ${minecraft-core}/${minecraft-maps}/${realm}/backups/
+backup-date-format: yyyy-MM-dd-HH-mm-ss
+backup-empty-server: false
+disable-zipping: false
+broadcast-message: true
+backup-message: '[SimpleBackup]'
+custom-backup-message: Backup starting
+custom-backup-message-end: Backup completed
+backup-completed-hook: ''
+delete-schedule:
+  intervals:
+  - 1d
+  - 3d
+  - 4w
+  - 30w
+  interval-frequencies:
+  - 4h
+  - 1d
+  - 5d
+  - 30d
