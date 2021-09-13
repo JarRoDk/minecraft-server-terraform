@@ -25,6 +25,12 @@ resource "google_compute_instance" "default" {
   metadata_startup_script = "${data.template_file.default.rendered}"
 #  user_data = data.template_file.default.rendered
 
+ service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
+
 }
 output "public_ip" {
     value = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
@@ -45,4 +51,8 @@ data "template_file" "default" {
     minecraft-core = "/var/opt/minecraft"
     minecraft-words = "words"
   }
+}
+resource "google_service_account" "default" {
+    account_id   = "service_account_id"
+    display_name = "Service Account"
 }
