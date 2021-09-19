@@ -1,5 +1,5 @@
 #!/bin/bash 
-yum install ${openjdk} tmux wget zsh git unzip -y
+yum install ${openjdk} tmux wget zsh git unzip nginx htop -y
 mkdir -p ${minecraft-core}/${minecraft-bin}
 mkdir -p ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}
 
@@ -8,15 +8,15 @@ cd ${minecraft-core}
 CHSH=no sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 chsh -s /bin/zsh
 
-gsutil -m cp -r gs://minecraft-server-terraform/maps/${map-prefix}-${realm} ${minecraft-core}/${minecraft-maps}
+gsutil -m cp -r gs://minecraft-server-terraform/maps/ ${minecraft-core}
 gsutil -m cp -r gs://minecraft-server-terraform/${minecraft-version}/spigot-server ${minecraft-core}
 
 cd ${minecraft-core}/${minecraft-bin}
-tmux new-session -d -s Minecraft-Server 'java -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
+tmux new-session -d -s Minecraft-Server 'java -Xmx7G -Xms3G -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
 
 
 cat <<EOF >${minecraft-core}/backup-map.sh
-gsutil -m cp -r ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm} gs://minecraft-server-terraform/maps
+gsutil -m cp -r ${minecraft-core}/${minecraft-maps} gs://minecraft-server-terraform
 EOF
 
 cat <<EOF >${minecraft-core}/backup-server.sh
@@ -24,7 +24,7 @@ gsutil -m cp -r ${minecraft-core}/${minecraft-bin} gs://minecraft-server-terrafo
 EOF
 
 cat <<EOF >${minecraft-core}/backup-all.sh
-gsutil -m cp -r ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm} gs://minecraft-server-terraform/maps
+gsutil -m cp -r ${minecraft-core}/${minecraft-maps} gs://minecraft-server-terraform
 gsutil -m cp -r ${minecraft-core}/${minecraft-bin} gs://minecraft-server-terraform/${minecraft-version}
 EOF
 
@@ -50,3 +50,4 @@ delete-schedule:
   - 1d
   - 5d
   - 30d
+EOF

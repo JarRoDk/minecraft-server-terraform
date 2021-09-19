@@ -4,7 +4,7 @@ data "google_compute_default_service_account" "default" {
 
 resource "google_compute_instance" "default" {
   name         = "minecraft-temporary-server-centos7"
-  machine_type = "e2-medium"
+  machine_type = "e2-standard-2"
   zone         = "europe-central2-a"
   project = "quantum-bonus-325717"
 
@@ -22,7 +22,6 @@ resource "google_compute_instance" "default" {
 
     access_config {
       // Ephemeral public IP
-      network_tier = "STANDARD"
     }
   }
 
@@ -46,7 +45,7 @@ data "template_file" "default" {
     minecraft-bin = "spigot-server"
     minecraft-maps = "maps"
     map-prefix = "map"
-    realm = "1an"
-    simplybackup-interval-hours = "0.25"
+    realm = "2mm"
+    simplybackup-interval-hours = "0.5"
   }
 }
