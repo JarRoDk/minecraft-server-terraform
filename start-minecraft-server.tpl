@@ -1,5 +1,5 @@
 #!/bin/bash 
-yum install ${openjdk} tmux wget zsh git unzip nginx htop -y
+yum install  tmux wget zsh git unzip nginx htop -y
 mkdir -p ${minecraft-core}/${minecraft-bin}
 mkdir -p ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}
 
@@ -10,9 +10,10 @@ chsh -s /bin/zsh
 
 gsutil -m cp -r gs://minecraft-server-terraform/maps/ ${minecraft-core}
 gsutil -m cp -r gs://minecraft-server-terraform/${minecraft-version}/spigot-server ${minecraft-core}
+yum install /opt/minecraft/spigot-server/jdk-16.0.2_linux-x64_bin.rpm -y
 
 cd ${minecraft-core}/${minecraft-bin}
-tmux new-session -d -s Minecraft-Server 'java -Xmx7G -Xms3G -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
+tmux new-session -d -s Minecraft-Server 'java -Xms1G -Xmx6G -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
 
 
 cat <<EOF >${minecraft-core}/backup-map.sh
