@@ -1,5 +1,8 @@
 #!/bin/bash 
 yum install  tmux wget zsh git unzip nginx htop -y
+
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && sudo NEW_RELIC_API_KEY=${api_key} NEW_RELIC_ACCOUNT_ID=${key} NEW_RELIC_REGION=EU /usr/local/bin/newrelic install -y
+
 mkdir -p ${minecraft-core}/${minecraft-bin}
 mkdir -p ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}
 
@@ -13,8 +16,7 @@ gsutil -m cp -r gs://minecraft-server-terraform/${minecraft-version}/spigot-serv
 yum install /opt/minecraft/spigot-server/jdk-16.0.2_linux-x64_bin.rpm -y
 
 cd ${minecraft-core}/${minecraft-bin}
-tmux new-session -d -s Minecraft-Server 'java -Xms1G -Xmx6G -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
-
+tmux new-session -d -s Minecraft-Server 'java -javaagent:/opt/minecraft/spigot-server/newrelic/newrelic.jar -Xms1G -Xmx6G -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
 
 cat <<EOF >${minecraft-core}/backup-map.sh
 gsutil -m cp -r ${minecraft-core}/${minecraft-maps} gs://minecraft-server-terraform
@@ -52,3 +54,4 @@ delete-schedule:
   - 5d
   - 30d
 EOF
+

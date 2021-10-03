@@ -33,7 +33,17 @@ resource "google_compute_instance" "default" {
   }
 }
 
+data "google_secret_manager_secret_version" "key" {
+  project = "quantum-bonus-325717"
+  secret   = "new_relic_key"
+  version  = "1"
+}
 
+data  "google_secret_manager_secret_version" "apikey" {
+  project = "quantum-bonus-325717"
+  secret   = "new_relic_api_key"
+  version  = "1"
+}
 
 data "template_file" "default" {
   template = "${file("start-minecraft-server.tpl")}"
@@ -47,5 +57,8 @@ data "template_file" "default" {
     map-prefix = "map"
     realm = "2mm"
     simplybackup-interval-hours = "0.5"
+    key = data.google_secret_manager_secret_version.key.secret_data 
+    api_key = data.google_secret_manager_secret_version.apikey.secret_data
   }
 }
+
