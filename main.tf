@@ -31,6 +31,14 @@ resource "google_compute_instance" "default" {
     email  = data.google_compute_default_service_account.default.email
     scopes = ["cloud-platform"]
   }
+  scheduling {
+    preemptible = true
+    automatic_restart = false
+  }
+
+#  metadata = {
+#    shutdown-script = "/usr/bin/sh /opt/minecraft/backup-all.sh"
+#  }
 }
 
 data "google_secret_manager_secret_version" "key" {
@@ -45,6 +53,7 @@ data  "google_secret_manager_secret_version" "apikey" {
   version  = "1"
 }
 
+
 data "template_file" "default" {
   template = "${file("start-minecraft-server.tpl")}"
   vars = {
@@ -55,8 +64,9 @@ data "template_file" "default" {
     minecraft-bin = "spigot-server"
     minecraft-maps = "maps"
     map-prefix = "map"
-    realm = "2mm"
-    simplybackup-interval-hours = "0.5"
+#    realm = "2mm"
+    realm = "3magda-jasin-agata"
+    simplybackup-interval-hours = "2"
     key = data.google_secret_manager_secret_version.key.secret_data 
     api_key = data.google_secret_manager_secret_version.apikey.secret_data
   }
