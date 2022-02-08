@@ -15,8 +15,10 @@ gsutil -m cp -r gs://minecraft-server-terraform/maps/ ${minecraft-core}
 gsutil -m cp -r gs://minecraft-server-terraform/${minecraft-version}/spigot-server ${minecraft-core}
 yum install /opt/minecraft/spigot-server/jdk-16.0.2_linux-x64_bin.rpm -y
 
+cat <<EOF >${minecraft-core}/${minecraft-bin}/startMinecraft.sh
 cd ${minecraft-core}/${minecraft-bin}
 tmux new-session -d -s Minecraft-Server 'java -javaagent:/opt/minecraft/spigot-server/newrelic/newrelic.jar -Xms1G -Xmx6G -jar ${minecraft-core}/${minecraft-bin}/spigot${minecraft-version}.jar --world-container ${minecraft-core}/${minecraft-maps}/${map-prefix}-${realm}'
+EOF
 
 cat <<EOF >${minecraft-core}/backup-map.sh
 gsutil -m cp -r ${minecraft-core}/${minecraft-maps} gs://minecraft-server-terraform
