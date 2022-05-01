@@ -1,21 +1,20 @@
 data "google_compute_default_service_account" "default" {
-  project = "quantum-bonus-325717"
+  project = var.project_name
 }
 
 resource "google_compute_instance" "default" {
-  name         = "minecraft-temporary-server-centos7"
-  machine_type = "e2-standard-2"
-  zone         = "europe-central2-a"
-  project      = "quantum-bonus-325717"
+  name         = var.gci_name
+  machine_type = var.machine_type
+  zone         = var.zone
+  project      = var.project_name
 
 
   boot_disk {
     initialize_params {
-      image = "centos-cloud/centos-7"
+      image = var.boot_disk_image_name
     }
   }
-  tags = ["minecraft-server"]
-
+  tags = var.tags
 
   network_interface {
     network = "default"
@@ -32,7 +31,7 @@ resource "google_compute_instance" "default" {
     scopes = ["cloud-platform"]
   }
   scheduling {
-    preemptible       = true
+    preemptible       = var.preemptible
     automatic_restart = false
   }
 
@@ -42,13 +41,13 @@ resource "google_compute_instance" "default" {
 }
 
 data "google_secret_manager_secret_version" "key" {
-  project = "quantum-bonus-325717"
+  project = var.project_name
   secret  = "new_relic_key"
   version = "1"
 }
 
 data "google_secret_manager_secret_version" "apikey" {
-  project = "quantum-bonus-325717"
+  project = var.project_name
   secret  = "new_relic_api_key"
   version = "1"
 }
@@ -57,18 +56,18 @@ data "google_secret_manager_secret_version" "apikey" {
 data "template_file" "default" {
   template = file("start-minecraft-server.tpl")
   vars = {
-    minecraft-version = "1.17.1"
+    minecraft-version = var.minecraft_version
     #    minecraft-download-spigot = "https://download.getbukkit.org/spigot/spigot" need to move it to build script
-    openjdk        = "java-latest-openjdk-16.0.1.0.9-3.rolling.el7.x86_64"
-    minecraft-core = "/opt/minecraft"
-    minecraft-bin  = "spigot-server"
-    minecraft-maps = "maps"
-    map-prefix     = "map"
-    #    realm = "2mm"
-    realm                       = "3magda-jasin-agata"
-    simplybackup-interval-hours = "2"
+    openjdk        = var.openjdk
+    minecraft-core = var.minecraft-core
+    minecraft-bin  = var.minecraft-bin
+    minecraft-maps = var.minecraft-maps
+    map-prefix     = var.map-prefix
+    realm                       = var.realm
+    simplybackup-interval-hours = var.simplybackup-interval-hours
     key                         = data.google_secret_manager_secret_version.key.secret_data
     api_key                     = data.google_secret_manager_secret_version.apikey.secret_data
   }
 }
+
 

@@ -57,3 +57,5 @@ delete-schedule:
   - 30d
 EOF
 
+cd ${minecraft-core}/${minecraft-bin}
+sh startMinecraft.sh
