@@ -1,4 +1,5 @@
 variable "project_name" {
+  default = "terraform-minecraft"
 }
 variable gci_name {
 }
@@ -35,4 +36,13 @@ variable cloudflare_api_token {
 variable dns_zone {
 }
 variable dns_name {
+}
+variable subnet_name_public {
+}
+variable subnet_name_private {
+}
+variable subnet_cidr_public {
+}
+variable region {
+  default = "europe-central2"
 }

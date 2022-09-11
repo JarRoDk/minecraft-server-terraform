@@ -1,0 +1,28 @@
+resource "google_compute_network" "vpc" {
+ name                    = "${var.project_name}-vpc"
+ auto_create_subnetworks = "false"
+}
+
+resource "google_compute_subnetwork" "subnet_public" {
+    name = var.subnet_name_public
+    ip_cidr_range = var.subnet_cidr_public
+    network = ${var.project_name}-vpc
+    depends_on    = google_compute_network.${project_name}-vpc
+    region      = var.region
+}
+
+resource "google_compute_firewall" "firewall" {
+  name    = "${var.project_name}-firewall"
+  network = google_compute_network.${var.project_name}.name
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
