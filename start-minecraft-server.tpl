@@ -36,7 +36,7 @@ EOF
 cat <<EOF >${minecraft-core}/${minecraft-bin}/plugins/SimpleBackup/config.yml
 backup-interval-hours: ${simplybackup-interval-hours}
 backup-file: ${minecraft-core}/backups/${minecraft-maps}/${realm}/
-backup-date-format: ${realm}-yyyy-MM-dd-HH-mm-ss
+backup-date-format: yyyy-MM-dd-HH-mm-ss
 backup-empty-server: false
 disable-zipping: false
 broadcast-message: true
